@@ -56,7 +56,7 @@ export default function Home() {
         {isLoading ? (
           <div>Loading...</div>
         ) : (
-          <PokemonList pokemons={pokemons} />
+          <PokemonList pokemons={pokemons} isSavedPage={false} />
         )}
       </div>
       {hasMorePokemon ? (
