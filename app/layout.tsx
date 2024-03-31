@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
+'use client';
+
+// import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { SelectedPokemonsProvider } from "@/context/selectedPokemonContext";
+import "@/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Pokedex App",
-  description: "show list of pokemons",
-};
 
 export default function RootLayout({
   children,
@@ -16,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SelectedPokemonsProvider>
+          {children}
+        </SelectedPokemonsProvider>
+      </body>
     </html>
   );
 }

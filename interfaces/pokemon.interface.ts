@@ -28,6 +28,7 @@ export interface ListPokemon {
   height: number;
   weight: number;
   type: string[];
+  alias?: string;
 }
 
 export interface IndexedType {

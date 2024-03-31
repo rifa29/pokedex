@@ -1,8 +1,8 @@
 "use client";
 
-import PokemonList from "./components/PokemonList";
-import usePokemons from "./hooks/usePokemons";
-import { IndexedType } from "./interfaces/pokemon.interface";
+import PokemonList from "@/components/PokemonList";
+import usePokemons from "@/hooks/usePokemons";
+import { IndexedType } from "@/interfaces/pokemon.interface";
 
 export default function Home() {
   const {
@@ -20,7 +20,6 @@ export default function Home() {
   const handleSelectedType = (type: IndexedType | null) => {
     if (type) {
       setSelectedType(type);
-      console.log("pokemons", pokemons);
     } else {
       setPokemons([]);
       setSelectedType(null);
@@ -32,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-[1200px] mx-auto py-10">
+    <main className="max-w-[1200px] mx-auto py-10">
       <div className="mb-10">
         {pokemonTypes.map((type) => (
           <button
@@ -44,12 +43,15 @@ export default function Home() {
           </button>
         ))}
       </div>
-      <input
-        type="text"
-        placeholder="Search Pokemon..."
-        onChange={handleSearchChange}
-        className="border border-gray-300 rounded-md px-3 py-2 mb-4"
-      />
+      <div className="flex justify-between">
+        <input
+          type="text"
+          placeholder="Search Pokemon..."
+          onChange={handleSearchChange}
+          className="border border-gray-300 rounded-md px-3 py-2 mb-4"
+        />
+        <a href="/savedPokemon" className="text-blue-500">See saved pokemon</a>
+      </div>
       <div className="grid grid-cols-4 gap-4 mb-8">
         {isLoading ? (
           <div>Loading...</div>

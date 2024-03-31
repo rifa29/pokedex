@@ -1,11 +1,11 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   POKEMON_API_BASE_URL,
   POKEMON_API_POKEMON_URL,
   POKEMON_IMAGES_BASE_URL,
   POKEMON_TYPES,
-} from "../../app/constans";
+} from "@/constans";
 import {
   IndexedPokemon,
   ListPokemon,
@@ -13,7 +13,6 @@ import {
   IndexedType,
   PokemonByTypeListResponse,
 } from "../interfaces/pokemon.interface";
-// import { useSelectedPokemons } from '../context/selectedPokemonContext';
 
 interface UsePokemonsResult {
   pokemons: ListPokemon[];
@@ -34,13 +33,14 @@ const usePokemons = (): UsePokemonsResult => {
   );
   const [selectedType, setSelectedType] = useState<IndexedType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const MAX_POKEMON_COUNT = 100;
+  const pokemonCountRef = useRef<number>(0); 
 
-  // const { addSelectedPokemon } = useSelectedPokemons();
 
   useEffect(() => {
-    if(selectedType) {
-      fetchPokemonByType()
+    if (selectedType) {
+      fetchPokemonByType();
     } else {
       fetchPokemon();
     }
@@ -52,15 +52,17 @@ const usePokemons = (): UsePokemonsResult => {
       const result = await axios.get<PokemonByTypeListResponse>(
         selectedType.url
       );
-      if(result?.data?.pokemon) {
-        const listPokemon = result.data.pokemon.map((p) => indexedPokemonToListPokemon(p.pokemon));
-  
-        const pokemonDetailsPromises = result.data.pokemon.map(
-          (p) => fetchPokemonDetails(p.pokemon.name)
+      if (result?.data?.pokemon) {
+        const listPokemon = result.data.pokemon.map((p) =>
+          indexedPokemonToListPokemon(p.pokemon)
         );
-  
+
+        const pokemonDetailsPromises = result.data.pokemon.map((p) =>
+          fetchPokemonDetails(p.pokemon.name)
+        );
+
         const pokemonDetails = await Promise.all(pokemonDetailsPromises);
-  
+
         const pokemonsWithDetails = listPokemon.map(
           (pokemon: IndexedPokemon, index: string | number) => ({
             ...pokemon,
@@ -71,7 +73,7 @@ const usePokemons = (): UsePokemonsResult => {
             ),
           })
         );
-  
+
         setPokemons(pokemonsWithDetails);
         setNextUrl(POKEMON_API_POKEMON_URL);
       }
@@ -107,7 +109,7 @@ const usePokemons = (): UsePokemonsResult => {
   };
 
   const fetchPokemon = async () => {
-    if (nextUrl) {
+    if (nextUrl && pokemonCountRef.current < MAX_POKEMON_COUNT) {
       const result = await axios.get<PokemonListResponse>(nextUrl);
 
       if (result?.data?.results) {
@@ -134,17 +136,15 @@ const usePokemons = (): UsePokemonsResult => {
 
         setPokemons([...pokemons, ...pokemonsWithDetails]);
         setNextUrl(result.data.next);
+
+        pokemonCountRef.current += result.data.results.length;
+        console.log('count', pokemonCountRef.current )
       }
     }
   };
 
-  // const handlePokemonClick = (pokemon: ListPokemon) => {
-  //   addSelectedPokemon(pokemon);
-    
-  // };
-
   // Filter pokemons based on search query
-  const filteredPokemons = pokemons.filter(pokemon =>
+  const filteredPokemons = pokemons.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -158,8 +158,6 @@ const usePokemons = (): UsePokemonsResult => {
     setPokemons,
     isLoading,
     setSearchQuery,
-    // handlePokemonClick,
-    // usePokemons
   };
 };
 
