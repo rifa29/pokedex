@@ -124,7 +124,7 @@ const usePokemons = (): UsePokemonsResult => {
         const pokemonDetails = await Promise.all(pokemonDetailsPromises);
 
         const pokemonsWithDetails = listPokemons.map(
-          (pokemon: IndexedPokemon, index: string | number) => ({
+          (pokemon: IndexedPokemon, index: number) => ({
             ...pokemon,
             height: pokemonDetails[index].height,
             weight: pokemonDetails[index].weight,
@@ -138,7 +138,6 @@ const usePokemons = (): UsePokemonsResult => {
         setNextUrl(result.data.next);
 
         pokemonCountRef.current += result.data.results.length;
-        console.log('count', pokemonCountRef.current )
       }
     }
   };
