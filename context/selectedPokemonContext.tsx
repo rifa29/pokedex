@@ -29,29 +29,33 @@ interface ISelectedPokemonProvider {
 }
 
 export const SelectedPokemonsProvider = ({ children }: ISelectedPokemonProvider) => {
-  const [selectedPokemons, setSelectedPokemons] = useState<ListPokemon[]>(
-    JSON.parse(localStorage.getItem("selectedPokemon") || '[]') || []
-  );
-
-  useEffect(() => {
-    localStorage.setItem("selectedPokemon", JSON.stringify(selectedPokemons));
-  }, [selectedPokemons]);
-
-  const addSelectedPokemon = (pokemon: ListPokemon) => {
-    setSelectedPokemons((prevState) => [...prevState, pokemon]);
-  };
-
-  const removeSelectedPokemon = (pokemonName: string) => {
-    setSelectedPokemons((prevState) =>
-      prevState.filter((pokemon) => pokemon.name !== pokemonName)
+  if (typeof window !== 'undefined') {
+    const [selectedPokemons, setSelectedPokemons] = useState<ListPokemon[]>(
+      JSON.parse(localStorage.getItem("selectedPokemon") || '[]') || []
     );
-  };
 
-  return (
-    <SelectedPokemonsContext.Provider
-      value={{ selectedPokemons, addSelectedPokemon, removeSelectedPokemon }}
-    >
-      {children}
-    </SelectedPokemonsContext.Provider>
-  );
+    useEffect(() => {
+      localStorage.setItem("selectedPokemon", JSON.stringify(selectedPokemons));
+    }, [selectedPokemons]);
+    
+
+    const addSelectedPokemon = (pokemon: ListPokemon) => {
+      setSelectedPokemons((prevState) => [...prevState, pokemon]);
+    };
+
+    const removeSelectedPokemon = (pokemonName: string) => {
+      setSelectedPokemons((prevState) =>
+        prevState.filter((pokemon) => pokemon.name !== pokemonName)
+      );
+    };
+    
+
+    return (
+      <SelectedPokemonsContext.Provider
+        value={{ selectedPokemons, addSelectedPokemon, removeSelectedPokemon }}
+      >
+        {children}
+      </SelectedPokemonsContext.Provider>
+    );
+    }
 };
