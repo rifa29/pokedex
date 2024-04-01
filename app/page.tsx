@@ -50,7 +50,7 @@ export default function Home() {
           onChange={handleSearchChange}
           className="border border-gray-300 rounded-md px-3 py-2 mb-4"
         />
-        <a href="/savedPokemon" className="text-blue-500">See saved pokemons</a>
+        <a href="/pokedex/savedPokemon" className="text-blue-500">See saved pokemons</a>
       </div>
       <div className="grid grid-cols-4 gap-4 mb-8">
         {isLoading ? (

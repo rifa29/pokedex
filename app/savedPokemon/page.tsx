@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <main className="w-[1200px] mx-auto py-10">
-      <a href="/" className='text-blue-500 mb-4 block'>Back to pokemon list</a>
+      <a href="/pokedex" className='text-blue-500 mb-4 block'>Back to pokemon list</a>
       <div className="grid grid-cols-4 gap-4 mb-8">
         <PokemonList pokemons={selectedPokemon?.selectedPokemons || []} isSavedPage={true} />
       </div>
