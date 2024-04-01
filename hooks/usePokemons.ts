@@ -12,6 +12,7 @@ import {
   PokemonListResponse,
   IndexedType,
   PokemonByTypeListResponse,
+  IndexedPokemonByType
 } from "../interfaces/pokemon.interface";
 
 interface UsePokemonsResult {
@@ -35,8 +36,7 @@ const usePokemons = (): UsePokemonsResult => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const MAX_POKEMON_COUNT = 100;
-  const pokemonCountRef = useRef<number>(0); 
-
+  const pokemonCountRef = useRef<number>(0);
 
   useEffect(() => {
     if (selectedType) {
@@ -53,33 +53,41 @@ const usePokemons = (): UsePokemonsResult => {
         selectedType.url
       );
       if (result?.data?.pokemon) {
-        const listPokemon = result.data.pokemon.map((p) =>
-          indexedPokemonToListPokemon(p.pokemon)
-        );
-
         const pokemonDetailsPromises = result.data.pokemon.map((p) =>
           fetchPokemonDetails(p.pokemon.name)
         );
-
+  
         const pokemonDetails = await Promise.all(pokemonDetailsPromises);
-
-        const pokemonsWithDetails = listPokemon.map(
-          (pokemon: IndexedPokemon, index: number) => ({
-            ...pokemon,
-            height: pokemonDetails[index].height,
-            weight: pokemonDetails[index].weight,
-            types: pokemonDetails[index].types.map(
-              (type: any) => type.type.name
-            ),
-          })
+  
+        const pokemonsWithDetails = result.data.pokemon.map(
+          (pokemon: IndexedPokemonByType, index: number) => {
+            const pokemonNumber = parseInt(
+              pokemon.pokemon.url
+                .replace(`${POKEMON_API_POKEMON_URL}/`, "")
+                .replace("/", "")
+            );
+  
+            return {
+              name: pokemon.pokemon.name,
+              url: pokemon.pokemon.url,
+              height: pokemonDetails[index].height,
+              weight: pokemonDetails[index].weight,
+              type: pokemonDetails[index].types.map(
+                (type: any) => type.type.name
+              ),
+              image: `${POKEMON_IMAGES_BASE_URL}/${pokemonNumber}.png`,
+              pokemonNumber: pokemonNumber,
+            };
+          }
         );
-
+  
         setPokemons(pokemonsWithDetails);
         setNextUrl(POKEMON_API_POKEMON_URL);
       }
     }
     setIsLoading(false);
   };
+  
 
   const fetchPokemonDetails = async (pokemonName: string) => {
     try {
@@ -123,15 +131,26 @@ const usePokemons = (): UsePokemonsResult => {
 
         const pokemonDetails = await Promise.all(pokemonDetailsPromises);
 
-        const pokemonsWithDetails = listPokemons.map(
-          (pokemon: IndexedPokemon, index: number) => ({
-            ...pokemon,
-            height: pokemonDetails[index].height,
-            weight: pokemonDetails[index].weight,
-            type: pokemonDetails[index].types.map(
-              (type: any) => type.type.name
-            ),
-          })
+        const pokemonsWithDetails = result.data.results.map(
+          (pokemon: IndexedPokemon, index: number) => {
+            const pokemonNumber = parseInt(
+              pokemon.url
+                .replace(`${POKEMON_API_POKEMON_URL}/`, "")
+                .replace("/", "")
+            );
+
+            return {
+              name: pokemon.name,
+              url: pokemon.url,
+              image: `${POKEMON_IMAGES_BASE_URL}/${pokemonNumber}.png`,
+              pokemonNumber: pokemonNumber,
+              height: pokemonDetails[index].height,
+              weight: pokemonDetails[index].weight,
+              type: pokemonDetails[index].types.map(
+                (type: any) => type.type.name
+              ),
+            };
+          }
         );
 
         setPokemons([...pokemons, ...pokemonsWithDetails]);
